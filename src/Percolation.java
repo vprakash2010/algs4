@@ -26,18 +26,18 @@ public class Percolation {
         if (n <= 0)
             throw new java.lang.IllegalArgumentException("n should be >=1");
         
-        site = new int[n+2][n+1];
-        obj = new WeightedQuickUnionUF((n+2)*n+2);
-        for (i = 1; i <= n; i++)
-            for (j = 1; j <= n; j++)
+        site = new int[n][n];
+        obj = new WeightedQuickUnionUF(n*n+2);
+        for (i = 0; i < n; i++)
+            for (j = 0; j < n; j++)
             {
                 site[i][j] = 0; 
             }           
-        for (i = 1; i <= n; i++) {
+        for (i = 0; i < n; i++) {
             p = i;
-            q = n*n+i;
-            obj.union(p, n*n+n+1);
-            obj.union(q, n*n+n+2);
+            q = (n-1)*n+i;
+            obj.union(p, n*n);
+            obj.union(q, n*n+1);
         }
         count = 0;
     }
@@ -54,11 +54,11 @@ public class Percolation {
         
         if (col < 1 || col > n) throw new ArrayIndexOutOfBoundsException("column index out of bounds");
         
-        //row -= 1;
-        //col -= 1;
+        row -= 1;
+        col -= 1;
         
         
-        p = (row-1) *n+col;
+        p = row *n+col;
         
         if (site[row][col] == 1)
             return;
@@ -66,19 +66,19 @@ public class Percolation {
             site[row][col] = 1;
             
         if (((row - 1) >= 0) && (site[row-1][col] == 1)){
-            q = (row-2)*n+col;
+            q = (row-1)*n+col;
             obj.union(p, q); 
         }        
         if (((row + 1) < n) && (site[row + 1][col] == 1)) {
-            q = (row)*n+col;
+            q = (row+1)*n+col;
             obj.union(p, q);
         }
         if (((col - 1) >= 0) && (site[row][col - 1] == 1)) {
-            q = (row-1)*n +(col - 1);
+            q = row*n +(col - 1);
             obj.union(p, q);
         }
         if (((col + 1) < n) && (site[row][col + 1] == 1)) {
-            q = (row-1)*n + col + 1;
+            q = row*n + col + 1;
             obj.union(p, q);
         }
         count += 1; 
@@ -94,7 +94,7 @@ public class Percolation {
         if (row < 1 || row > n) throw new ArrayIndexOutOfBoundsException("row index out of bounds");      
         if (col < 1 || col > n) throw new ArrayIndexOutOfBoundsException("column index out of bounds");
         
-        return site[row][col] == 1;
+        return site[row - 1][col - 1] == 1;
     }
     /**
      * 
@@ -107,11 +107,11 @@ public class Percolation {
         
         if (row < 1 || row > n) throw new ArrayIndexOutOfBoundsException("row index out of bounds");      
         if (col < 1 || col > n) throw new ArrayIndexOutOfBoundsException("column index out of bounds");
-        //row -= 1;
-        //col -= 1;
+        row -= 1;
+        col -= 1;
         
-        p = (row-1)*n + col;
-        return obj.connected(p, n*n+n+1) && isOpen(row, col);
+        p = row*n + col;
+        return obj.connected(p, n*n) && isOpen(row+1, col+1);
     
     }
     /**
@@ -119,29 +119,26 @@ public class Percolation {
      * @return returns true if the system percolates.
      */
     public boolean percolates() {
-        
-        /*
         int row, i;
         boolean flag1, flag2;
         flag1 = false;
         flag2 = false;
-       
-        row = 1;
-        for(i =1;i<=n;i++){
+        
+        row = 0;
+        for(i =0;i<n;i++){
             if(isOpen(row,i)){
                 flag1 = true;
                 break;
             }         
         }
-        row = n;
-        for(i =1; i<=n;i++){
+        row = n-1;
+        for(i =0; i<n;i++){
             if(isOpen(row,i)){
                 flag2 = true;
                 break;
             }
         }
-        */
-        return obj.connected(n*n+n+1, n*n+n+2);//&& flag1 && flag2;
+        return obj.connected(n*n, n*n+1) && flag1 && flag2;
     
     }
     /**
